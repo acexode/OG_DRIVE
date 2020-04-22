@@ -1,31 +1,26 @@
 import React, { Component,useState,useContext } from 'react';
 import logo from '../../assets/outsource-logo-square.png';
-import './login.css'
+import './signup.css'
 import axios from "axios";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useHistory } from 'react-router-dom';
 
-const Login  = () =>{
+const Signup  = () =>{
   let history = useHistory()
   const [message,setMessage] = useState('')
   const [show,setShow] = useState(false)
   return (
   <Formik
-    initialValues={{ ogID: "", password: "" }}
+    initialValues={{ ogID: "", password: "", department:"", fullname: "" }}
     onSubmit={(values, { setSubmitting }) => {
       setTimeout(() => {
         console.log("Logging in", values);
         axios.post(``,  values )
         .then(res => {
           console.log(res);
-          console.log(res.data);
-          let user = {fullName: res.data.user.fullName, id: res.data.user._id}
-          localStorage.setItem("token", res.data.token)   
-          localStorage.setItem('department', res.data.user.department)
-          localStorage.setItem('fullname', res.data.user.fullName)
-          localStorage.setItem('ogID', res.data.user.ogID)         
-          history.push('/',{user: res.data.user})       
+          console.log(res.data);                  
+          history.push('/login')       
         })
         .catch(err =>{
           console.log(err.response.data.msg)
@@ -37,6 +32,10 @@ const Login  = () =>{
     }}
     validationSchema={Yup.object().shape({
       ogID: Yup.string() 
+        .required("Required"),
+      fullname: Yup.string() 
+        .required("Required"),
+      department: Yup.string() 
         .required("Required"),
       password: Yup.string()
         .required("No password provided.")        
@@ -54,8 +53,8 @@ const Login  = () =>{
       } = props;
       return (
       <div className="account-page">
-          <div className="main-wrapper mt-2">
-    <div className="account-content mt-4">
+          <div className="main-wrapper">
+    <div className="account-content">
     
       <div className="container">			
       
@@ -73,7 +72,7 @@ const Login  = () =>{
         
         <div className="account-box">
           <div className="account-wrapper">
-            <h3 className="account-title">Login</h3>
+            <h3 className="account-title">Signup</h3>
             <p className="account-subtitle">Access to our dashboard</p>
             
             
@@ -91,6 +90,36 @@ const Login  = () =>{
                 className="form-control" type="text" />
                 {errors.ogID && touched.ogID && (
                   <div className="input-feedback">{errors.ogID}</div>
+                )}
+              </div>
+              <div className="form-group">
+                <label>Fullname </label>
+                <input 
+                name="fullname"
+                type="text"
+                placeholder="Enter your fullname"
+                value={values.fullname}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={errors.fullname && touched.fullname && "error"}
+                className="form-control" type="text" />
+                {errors.fullname && touched.fullname && (
+                  <div className="input-feedback">{errors.fullname}</div>
+                )}
+              </div>
+              <div className="form-group">
+                <label>Department </label>
+                <input 
+                name="department"
+                type="text"
+                placeholder="Enter your Department"
+                value={values.department}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={errors.department && touched.department && "error"}
+                className="form-control" type="text" />
+                {errors.department && touched.department && (
+                  <div className="input-feedback">{errors.department}</div>
                 )}
               </div>
               <div className="form-group">
@@ -118,7 +147,7 @@ const Login  = () =>{
                 )}
               </div>
               <div className="form-group text-center">
-                <button className="btn btn-primary account-btn" disabled={isSubmitting} type="submit">Login</button>
+                <button className="btn btn-primary account-btn" disabled={isSubmitting} type="submit">Signup</button>
               </div>								
             </form>
           
@@ -135,4 +164,4 @@ const Login  = () =>{
       )
 }
 
-export default Login
+export default Signup

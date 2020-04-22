@@ -12,7 +12,8 @@ const jwt = require("jsonwebtoken");
 const multer  = require('multer'),
 multerS3 = require('multer-s3')
 
-
+console.log(process.env.AccessKeyID)
+console.log(process.env.SecretAccessKey)
 /**
  * AWS CONFIG
  */
@@ -90,27 +91,49 @@ router.post('/folder', passport.authenticate("jwt", { session: false }), functio
 router.post('/move', passport.authenticate("jwt", { session: false }), function(req, res) {
     const token = helper.getToken(req.headers);   
     if(token){
-        // let folder = req.body.folder
-        let folder = `folders.${req.body.folder}`
+        let folder = req.body.folder        
         console.log(folder)
+        console.log(req.body._id)
+        console.log(req.body.user)
         let file = {
             user: req.user._id,
             location: req.body.location,
             filename: req.body.filename
-        }
+        }        
         User.findOneAndUpdate(
-            {'folders.$.name': 'React'},
+            {_id: req.user._id},
             { 
-                // '$pull': { 'files': {_id: req.body._id} }, 
-                 '$push': { 'folders.React.files': file }
-            }, 
-            
+                '$pull': { 'files': {_id: req.body._id} },
+                       
+            },             
             (err, doc) =>{
             if(err){
-                return res.json({success: false, err, msg: 'unable to create a new folder'});
-            }else{
-                console.log(doc)
-                return res.status(200).send({success: true, msg: `Moved file ${req.body.filename}  to ${req.body.folder} folder Succesfully`});
+                console.log(err)
+                return res.json({success: false, err, msg: 'unable to move to folder'});
+            }else{               
+                User.findOne({'folders.name': folder}, (err, doc) =>{
+                    if(err){
+                        return res.json({success: false, msg: 'unable to find folder'});
+                    }else{
+                        let obj = doc.folders.map(e => {
+                            if(e.name == folder){
+                                 e.files.push(file);
+                            }
+                            return e
+                        })
+                        console.log(obj)
+                        doc.folders = obj
+                        doc.save(err, updates =>{
+                            if(err){
+                                return res.json({success: false, err, msg: 'unable to move to folder'});
+                            }else{
+                                return res.status(200).send({success: true, msg: `Moved file ${req.body.filename}  to ${req.body.folder} folder Succesfully`});
+                                // return res.status(200).send({success: true, msg: `folder found`, doc});
+                            }
+                        })
+                    }
+                }) 
+                
             }
         }) 
     }else{

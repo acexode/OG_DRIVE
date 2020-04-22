@@ -13,7 +13,7 @@ const FileSchema = Schema({
 
 const FolderSchema = Schema({
     user: { type: mongoose.Schema.ObjectId, ref: 'User' },
-    name: String,
+    name: {type: String, unique: true},
     files: [FileSchema]
   
 })

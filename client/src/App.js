@@ -1,10 +1,10 @@
 import React from 'react';
 import Sidebar from './components/sidebar/sidebar';
-import Header from './components/header/header';
 import { withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
 import Content from './components/content/content';
 import Login from './components/login/login';
 import Signup from './components/Signup/signup';
+import AuthGuard from "./components/login/AuthGuard"
 
 const Main = withRouter(({ location }) => {
     return (
@@ -15,8 +15,8 @@ const Main = withRouter(({ location }) => {
         </>
       )}
       <Switch>
-        <Route path="/home" component={Content} />
-        <Route path="/" exact component={Content} />
+        <AuthGuard path="/home" component={Content} />
+        <AuthGuard path="/" exact component={Content} />
         <Route path="/login" component={Login} />
         <Route path="/signup" component={Signup} />
       </Switch>

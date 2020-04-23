@@ -1,6 +1,12 @@
 import React from 'react'
+import {useHistory} from "react-router-dom"
 
 const Header = () => {
+    let history = useHistory()
+	const logout = () =>{
+        localStorage.removeItem('token')
+        history.push('/login')
+    }
     return (
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
@@ -29,7 +35,7 @@ const Header = () => {
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="#">Profile</a>
-                          <a class="dropdown-item" href="#">Logout</a>
+                          <a class="dropdown-item" href="#" onClick={logout}>Logout</a>
                           
                         </div>
                       </li>

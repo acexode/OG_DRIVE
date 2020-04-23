@@ -1,4 +1,4 @@
-import React, { Component,useState,useContext } from 'react';
+import React, { useState } from 'react';
 import logo from '../../assets/outsource-logo-square.png';
 import './login.css'
 import axios from "axios";
@@ -16,7 +16,7 @@ const Login  = () =>{
     onSubmit={(values, { setSubmitting }) => {
       setTimeout(() => {
         console.log("Logging in", values);
-        axios.post(``,  values )
+        axios.post(`http://localhost:5000/api/login`,  values )
         .then(res => {
           console.log(res);
           console.log(res.data);
@@ -28,9 +28,9 @@ const Login  = () =>{
           history.push('/',{user: res.data.user})       
         })
         .catch(err =>{
-          console.log(err.response.data.msg)
+          console.log(err.response.data.message)
           setShow(true)
-          setMessage(err.response.data.msg)
+          setMessage(err.response.data.message)
         })	
         setSubmitting(false);
       }, 500);

@@ -15,17 +15,17 @@ const Signup  = () =>{
     initialValues={{ ogID: "", password: "", department:"", fullname: "" }}
     onSubmit={(values, { setSubmitting }) => {
       setTimeout(() => {
-        console.log("Logging in", values);
-        axios.post(``,  values )
+        console.log("Signing up", values);
+        axios.post(`http://localhost:5000/api/signup`,  values )
         .then(res => {
           console.log(res);
           console.log(res.data);                  
           history.push('/login')       
         })
         .catch(err =>{
-          console.log(err.response.data.msg)
+          console.log(err.response.data.message)
           setShow(true)
-          setMessage(err.response.data.msg)
+          setMessage(err.response.data.message)
         })	
         setSubmitting(false);
       }, 500);

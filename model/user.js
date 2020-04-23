@@ -27,6 +27,7 @@ const userSchema = Schema({
     password: String,
     fullname: String,  
     department: String,
+    role: '',
     files: [FileSchema],
     folders: [FolderSchema],
     shared: [FileSchema]

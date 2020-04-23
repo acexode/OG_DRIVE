@@ -21,8 +21,18 @@
   },
   "devDependencies": {},
   "scripts": {
+<<<<<<< HEAD:server/package.json
     "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+=======
+    "client-install": "npm install --prefix client",
+    "start": "node index.js",
+    "heroku-postbuild": "cd client && npm install --only=dev && npm install && npm run build",
+    "server": "nodemon index.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+
+>>>>>>> 4811ecf57df1bf38ef31c3cce952b947cd4b7f83:package.json
   },
   "author": "",
   "license": "ISC"

@@ -4,7 +4,7 @@ require("../config/auth")(passport);
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const User = require("../model/user");
-
+const helper = require('../helper/helper')
 /*
 POST REQUEST
 SIGNUP, LOGIN 
@@ -64,6 +64,38 @@ router.post("/login", (req, res) => {
       });
     }
   });
+});
+
+// modify account details
+router.put("/user/:id", passport.authenticate("jwt", {session: false}), (req, res) => {
+  const id = req.params.id;
+  const token = helper.getToken(req.headers)
+  if(token){
+    User.findOne({ _id: id }, {}, (err, user) => {
+      if (err) {
+        res.json({ success: false, message: err });
+      } else {
+        if (!user) {
+          res.json({ success: false, message: "user not found" });
+        } else {
+          user.fullname = req.body.fullname;
+          user.department = req.body.department;        
+          user.password = req.body.password;        
+          user.ogID = req.body.ogID; 
+          user.role = req.body.role       
+          user.save(err => {
+            if (err) {
+              res.json({ success: false, message: err });
+            } else {
+              res.json({ success: true, message: "user  details updated" });
+            }
+          });
+        }
+      }
+    });
+  }else{
+    res.json({ success: false, message: 'unauthorized access denied' });
+  }
 });
 
 

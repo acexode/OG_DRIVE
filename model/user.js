@@ -11,25 +11,13 @@ const FileSchema = Schema({
   
 })
 
-const FolderSchema = Schema({
-    user: { type: mongoose.Schema.ObjectId, ref: 'User' },
-    name: {type: String, unique: true},
-    files: [FileSchema]
-  
-})
-// const SharedSchema = Schema({
-//     user: { type: mongoose.Schema.ObjectId, ref: 'User' },
-//     filename: String
-  
-// })
+
 const userSchema = Schema({
     ogID: String,
     password: String,
     fullname: String,  
     department: String,
-    role: '',
-    files: [FileSchema],
-    folders: [FolderSchema],
+    role: '',    
     shared: [FileSchema]
 })
 userSchema.pre("save", function(next){
@@ -64,4 +52,4 @@ userSchema.methods.comparePassword = function(pwd,next){
 };
 
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model('Users', userSchema)

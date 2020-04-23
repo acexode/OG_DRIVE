@@ -7,7 +7,7 @@ const cors = require('cors')
 const routes = require('./routes/index')
 const auth = require('./routes/auth')
 const path = require('path');
-
+const seed = require('./model/seed')
 
 dotenv.config()
 

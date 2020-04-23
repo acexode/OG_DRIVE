@@ -5,6 +5,8 @@ require("../config/auth")(passport);
 const router = express.Router()
 const dotenv = require('dotenv').config()
 const User = require('../model/user')
+const Files = require('../model/file')
+const Folder = require('../model/folder')
 const AWS = require('aws-sdk');
 const fs = require('fs')
 const helper = require('../helper/helper');
@@ -39,9 +41,27 @@ var storage =  multer({
 
 
 
-
+/**
+ * 
+ * Get files belonging to  user 
+ * 
+ */
 router.get('/files', (req, res) =>{
-
+    var token = helper.getToken(req.headers)
+   
+    if (token) {
+        if(req.file){  
+            Files.find({user: req.user._id}, {}, (err, files)=>{
+                if(err){
+                    return res.json({success: false, msg: 'no file found'});
+                }else{
+                    return res.status(200).send({success: true, msg: `found ${files.length} belonging to user`, files});
+                }
+            }) 
+        }
+    } else {
+      return res.status(403).send({success: false, msg: 'Unauthorized.'});
+    }
 })
 
 /**
@@ -55,18 +75,18 @@ router.post('/file', passport.authenticate('jwt', { session: false}),storage.sin
    
     if (token) {
         if(req.file){           
-            let file = {
+            let file =new Files({
                 user: req.user._id,
                 location: req.file.location,
                 filename: req.file.originalname
-            }
-            User.findByIdAndUpdate({_id: req.user._id},{ '$addToSet': { 'files': file } }, (err, doc) =>{
+            })
+            file.save((err,file) =>{
                 if(err){
                     return res.json({success: false, msg: 'unable to save file to db'});
                 }else{
-                    return res.status(200).send({success: true, msg: 'Saved to storage.'});
+                    return res.status(200).send({success: true, msg: 'Saved to storage.', file});
                 }
-            })
+            })            
         }
     } else {
       return res.status(403).send({success: false, msg: 'Unauthorized.'});
@@ -90,54 +110,20 @@ router.post('/files', passport.authenticate('jwt', { session: false}),storage.ar
                     filename: e.originalname
                 }
                 return obj
-            })   
-            User.findByIdAndUpdate({_id: req.user._id},{ '$addToSet': { 'files': files } }, (err, doc) =>{
-                if(err){
-                    return res.json({success: false, msg: 'unable to save file to db'});
-                }else{
-                    return res.status(200).send({success: true, msg: 'Saved to storage.'});
-                }
             })
+            Files.create(files).then(docs =>{
+                return res.status(200).send({success: true, msg: 'Saved to storage.'});
+            }).catch(err =>{
+                return res.json({success: false, msg: 'unable to save file to db'});
+            })  
+            
         }
     } else {
       return res.status(403).send({success: false, msg: 'Unauthorized.'});
     }
   });
 
-/**
- * 
- * Delete a file 
- * 
- */
 
-router.post('/remove-folder-file', passport.authenticate("jwt", { session: false }), function(req, res) {
-    const token = helper.getToken(req.headers);   
-    if(token){
-        let folder = req.body._id                
-        let file = {
-            user: req.user._id,
-            location: req.body.location,
-            filename: req.body.filename
-        }        
-        User.findOneAndUpdate(
-            {_id: req.user._id},
-            { 
-                '$pull': { 'folders': {_id: req.body._id} },
-                       
-            },             
-            (err, doc) =>{
-            if(err){
-                console.log(err)
-                return res.json({success: false, err, msg: 'unable to move to folder'});
-            }else{      
-                return res.status(200).send({success: true, msg: `folder deleted`});        
-                
-            }
-        }) 
-    }else{
-        res.json({success: false, message: 'unathorized'})
-    }
-})
   /**
  * 
  * Create folder 
@@ -146,16 +132,38 @@ router.post('/remove-folder-file', passport.authenticate("jwt", { session: false
 router.post('/folder', passport.authenticate("jwt", { session: false }), function(req, res) {
     const token = helper.getToken(req.headers);   
     if(token){
-        let folder = {
+        let folder = new Folder({
             user: req.user._id,
             name: req.body.name,
             files: []
-        }
-        User.findByIdAndUpdate({_id: req.user._id},{ '$addToSet': { 'folders': folder } }, (err, doc) =>{
+        })
+        folder.save((err,doc) =>{
             if(err){
-                return res.json({success: false, msg: 'unable to create a new folder'});
+                return res.json({success: false, msg: 'unable to create new folder'});
             }else{
-                return res.status(200).send({success: true, msg: `Created a new folder ${req.body.name}`});
+                return res.status(200).send({success: true, msg: 'Folder created successfully', doc});
+            }
+        })
+    }else{
+        res.json({success: false, message: 'unauthorized'})
+    }
+})
+
+
+/**
+ * 
+ * Get Folder
+ * 
+ */
+router.get('/folder', passport.authenticate("jwt", { session: false }), function(req, res) {
+    const token = helper.getToken(req.headers);   
+    if(token){
+       
+        User.findOne({'folders.name': req.body.name}, (err, doc) =>{
+            if(err){
+                return res.json({success: false, msg: 'unable to find folder'});
+            }else{
+                return res.status(200).send({success: true, msg: `folder found`, doc});
             }
         }) 
     }else{
@@ -163,15 +171,12 @@ router.post('/folder', passport.authenticate("jwt", { session: false }), functio
     }
 })
 
-
-
-
 /**
  * 
- * Move file to folder
+ * Move file from root to folder
  * 
  */
-router.post('/move', passport.authenticate("jwt", { session: false }), function(req, res) {
+router.post('/root-to-folder', passport.authenticate("jwt", { session: false }), function(req, res) {
     const token = helper.getToken(req.headers);   
     if(token){
         let folder = req.body.folder        
@@ -182,48 +187,90 @@ router.post('/move', passport.authenticate("jwt", { session: false }), function(
             user: req.user._id,
             location: req.body.location,
             filename: req.body.filename
-        }        
-        User.findOneAndUpdate(
-            {_id: req.user._id},
-            { 
-                '$pull': { 'files': {_id: req.body._id} },
-                       
-            },             
-            (err, doc) =>{
+        }
+        Files.findByIdAndDelete({_id: req.body._id},(err, doc)=>{
             if(err){
-                console.log(err)
                 return res.json({success: false, err, msg: 'unable to move to folder'});
-            }else{               
-                User.findOne({'folders.name': folder}, (err, doc) =>{
+            }else{
+                Folder.findOneAndUpdate({user: req.user._id, name: req.body.folder},{ '$addToSet': { 'files': file },}, (err, update) =>{
                     if(err){
-                        return res.json({success: false, msg: 'unable to find folder'});
+                        return res.json({success: false, err, msg: 'unable to move to folder'});
                     }else{
-                        let obj = doc.folders.map(e => {
-                            if(e.name == folder){
-                                 e.files.push(file);
-                            }
-                            return e
-                        })
-                        console.log(obj)
-                        doc.folders = obj
-                        doc.save(err, updates =>{
-                            if(err){
-                                return res.json({success: false, err, msg: 'unable to move to folder'});
-                            }else{
-                                return res.status(200).send({success: true, msg: `Moved file ${req.body.filename}  to ${req.body.folder} folder Succesfully`});
-                                // return res.status(200).send({success: true, msg: `folder found`, doc});
-                            }
-                        })
+                        return res.status(200).send({success: true, msg: `Moved file ${req.body.filename}  to ${req.body.folder} folder Succesfully`});
+                        // return res.status(200).send({success: true, msg: `folder found`, doc});
                     }
-                }) 
-                
+                })
+
             }
-        }) 
+        })
+        
     }else{
         res.json({success: false, message: 'unathorized'})
     }
 })
+/**
+ * 
+ * Move file from folder to folder
+ * 
+ */
+router.post('/folder-to-folder', passport.authenticate("jwt", { session: false }), function(req, res) {
+    const token = helper.getToken(req.headers);   
+    if(token){
+        let folder = req.body.folder        
+        console.log(folder)
+        console.log(req.body._id)
+        console.log(req.body.user)
+        let file = {
+            user: req.user._id,
+            location: req.body.location,
+            filename: req.body.filename
+        }
+       
+        Folder.findOneAndUpdate
+        ({user: req.user._id, name: req.body.from}, 
+        {$pull : {'files': {user: req.user._id, filename: req.body.filename, location:  req.body.location}}},
+        ((err, resp) =>{
+            if(err){
+                return res.json({success: false, err, msg: 'unable to move to file'}); 
+            }else{
+                Folder.findOneAndUpdate({user: req.user._id, name: req.body.dest},{ '$addToSet': { 'files': file },}, (err, update) =>{
+                    if(err){
+                        return res.json({success: false, err, msg: 'unable to move to folder'});
+                    }else{
+                        return res.status(200).send({success: true, msg: `Moved ${req.body.filename} from  ${req.body.from}  to ${req.body.dest} folder Succesfully`});
+                        // return res.status(200).send({success: true, msg: `folder found`, doc});
+                    }
+                }) 
+            }
+        })
+        )
+        
+    }else{
+        res.json({success: false, message: 'unathorized'})
+    }
+})
+/**
+ * 
+ * Delete a a folder 
+ * 
+ */
 
+router.post('/remove-folder', passport.authenticate("jwt", { session: false }), function(req, res) {
+    const token = helper.getToken(req.headers);   
+    if(token){     
+        Folder.findByIdAndRemove({_id: req.body.file}, (err) =>{
+            if(err){
+                console.log(err)
+                return res.json({success: false, err, msg: 'file deleted successfully'});
+            }else{      
+                return res.status(200).send({success: true, msg: `folder deleted`}); 
+            }
+        })        
+        
+    }else{
+        res.json({success: false, message: 'unathorized'})
+    }
+})
 
 /**
  * 
@@ -251,55 +298,10 @@ router.post('/share', passport.authenticate("jwt", { session: false }), function
     }
 })
 
-/**
- * 
- * Delete a folder 
- * 
- */
 
-router.post('/remove-folder', passport.authenticate("jwt", { session: false }), function(req, res) {
-    const token = helper.getToken(req.headers);   
-    if(token){                
-             
-        User.findOneAndUpdate(
-            {_id: req.user._id},
-            { 
-                '$pull': { 'folders': {_id: req.body._id} },
-                       
-            },             
-            (err, doc) =>{
-            if(err){
-                console.log(err)
-                return res.json({success: false, err, msg: 'unable to move to folder'});
-            }else{      
-                return res.status(200).send({success: true, msg: `folder deleted`});        
-                
-            }
-        }) 
-    }else{
-        res.json({success: false, message: 'unathorized'})
-    }
-})
-/**
- * 
- * Get Folder
- * 
- */
-router.get('/folder', passport.authenticate("jwt", { session: false }), function(req, res) {
-    const token = helper.getToken(req.headers);   
-    if(token){
-       
-        User.findOne({'folders.name': 'React'}, (err, doc) =>{
-            if(err){
-                return res.json({success: false, msg: 'unable to find folder'});
-            }else{
-                return res.status(200).send({success: true, msg: `folder found`, doc});
-            }
-        }) 
-    }else{
-        res.json({success: false, message: 'unauthorized'})
-    }
-})
+
+
+
 
 module.exports = router
 

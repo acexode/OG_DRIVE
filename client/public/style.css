@@ -1,0 +1,336 @@
+body{
+    background: #f9fbfd;
+    overflow-x: hidden;
+}
+
+
+p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1em;
+    font-weight: 300;
+    line-height: 1.7em;
+    color: #999;
+}
+
+a,
+a:hover,
+a:focus {
+    color: inherit;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.navbar {
+    padding: 9px 10px;
+    background: #fff;
+    border-bottom: 1px solid #edf2f9;
+    border-radius: 0;
+    margin-bottom: 40px;
+    box-shadow: 0 -7px 9px 0 rgba(169,184,200,.15);
+    -webkit-box-shadow: 0 -7px 9px 0 rgba(169,184,200,.15);
+    -moz-box-shadow: 0 -7px 9px 0 rgba(169,184,200,.15);
+}
+
+.navbar-btn {
+    box-shadow: none;
+    outline: none !important;
+    border: none;
+}
+
+
+/* ---------------------------------------------------
+    SIDEBAR STYLE
+----------------------------------------------------- */
+
+.wrapper {
+    display: flex;
+    width: 100%;
+}
+
+#sidebar {
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 999;
+    background: #fff;
+    box-shadow: 0 3px 9px 0 rgba(169,184,200,.15);
+    -webkit-box-shadow: 0 3px 9px 0 rgba(169,184,200,.15);
+    -moz-box-shadow: 0 3px 9px 0 rgba(169,184,200,.15);
+    
+    transition: all 0.3s;
+}
+
+#sidebar.active {
+    margin-left: -250px;
+}
+
+#sidebar .sidebar-header {
+    display: flex;
+   justify-content: center;
+  
+    padding: 22px 10px;
+    border-bottom: 1px solid #F6F7FA;
+   
+}
+
+#sidebar ul.components {
+    display: flex;
+    justify-content: center;
+    padding: 15px 10px;
+    flex-direction: column;
+}
+#sidebar ul.components a{
+    margin: 10px;
+    
+}
+#sidebar ul.components a:not(.first) {
+    
+    color: #C1C1C1;
+}
+
+a.create-item{
+    background: #4986FC;
+    padding: 10px;
+    text-align: center;
+    color: #fff !important;
+  
+}
+i {
+    display: inline-block;
+    font-size: 24px;
+    line-height: 24px;
+    text-align: left;
+    vertical-align: middle;
+    width: 20px;
+    transition: all 0.2s ease-in-out 0s;
+    margin-right: 20px;
+  }
+i.la-hdd, i.la-google-drive{
+    color: #4986FC;
+}
+/* ---------------------------------------------------
+    CONTENT STYLE
+----------------------------------------------------- */
+
+#content {
+    width: calc(100% - 250px);
+    background: #F5F7FB;
+    min-height: 100vh;
+    transition: all 0.3s;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#content.active {
+    width: 100%;
+}
+.store-details{    
+    display: flex;
+    justify-content: center;
+    padding: 10px 10px;
+    flex-direction: column;
+    color: #C1C1C1;
+}
+.store-details a{
+    margin: 10px;
+}
+.store-info{
+    display: flex;
+    flex-direction: column;
+
+}
+.progress{
+    height: 0.2rem;
+}
+.customize-input {
+    position: relative;
+}
+.customize-input .form-control {
+   
+    color: #b8c3d5;
+    padding: 0px 10px;
+   
+    border-radius: 60px;
+    box-shadow: 0 2px 9px 0 rgba(169,184,200,.2);
+    -webkit-box-shadow: 0 2px 9px 0 rgba(169,184,200,.2);
+    -moz-box-shadow: 0 2px 9px 0 rgba(169,184,200,.2);
+}
+.profile-img{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+.btn-file{
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid #e9ecef;
+    border-radius: .25rem;
+    color: #7c8798;
+    outline: none;
+}
+.btn-file-active, .btn-file:hover {
+    background-color: #4986FC;
+    color: white;
+  }
+
+
+/* ---------------------------------------------------
+   Card
+----------------------------------------------------- */
+.card{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid #e9ecef;
+    border-radius: .25rem;
+    border-right: 1px solid #edf2f9!important;box-shadow: 0 3px 9px 0 rgba(169,184,200,.15);
+    -webkit-box-shadow: 0 3px 9px 0 rgba(169,184,200,.15);
+    -moz-box-shadow: 0 3px 9px 0 rgba(169,184,200,.15);
+    color: #C1C1C1;
+    margin: 20px;
+}
+.cfr{
+    display: flex;
+    
+}
+.cfc{
+    display: flex;
+    flex-direction: column;
+
+}
+.card-header{
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #edf2f9;
+    padding: 15 !important;
+}
+.card-body-details{
+    padding: 10px;
+    display: flex;
+}
+.owner{
+    border-right: 1px solid #edf2f9;
+    padding-right: 10px;
+    text-align: center;
+}
+
+.owner img{
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 5px;
+    
+}
+.docs{
+    justify-content: center;
+    align-items: center;  
+    width: 100%;
+    height: 80px;
+}
+
+
+.author{
+    display: flex;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  
+    margin-top: 27px;
+    margin-left: 5px;
+    margin-bottom: 25px;
+    justify-self: center;
+    padding-left: 4px;
+    align-items: center;   
+   
+}
+.author-1{
+    background: #c4f5cd;
+    color: #76C186;
+}
+.author-2{
+    background: #bfcdf5;
+    color: #6c83c4;
+}
+.author-3{
+    background: #f5c4c4;
+    color: rgb(193, 118, 118);
+}   
+.type, .action{
+    padding: 10px;
+    border-top: 1px solid #edf2f9;
+    margin-left: 5px;
+}   
+.action{
+    justify-content: space-around;
+}
+.file-type img{
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+}        
+
+
+
+
+
+
+
+
+
+
+
+
+/* ---------------------------------------------------
+    MEDIAQUERIES
+----------------------------------------------------- */
+
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+    #content {
+        width: 100%;
+    }
+    #content.active {
+        width: calc(100% - 250px);
+    }
+    #sidebarCollapse span {
+        display: none;
+    }
+}
+
+.mCSB_dragger_bar{
+    background: #C1C1C1 !important;
+}
+
+/* .page-wrapper {
+    background: #f9fbfd;
+    position: relative;
+   margin-left: 260px;
+    box-shadow: 0 3px 9px 0 rgba(162,176,190,.15);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.left-sidebar {
+    position: absolute;
+    width: 260px;
+    height: 100%;
+    top: 0;
+    z-index: 10;
+    padding-top: 80px;
+    background: #1c6bb9;
+    box-shadow: 0 3px 9px 0 rgba(169,184,200,.15);
+    -webkit-box-shadow: 0 3px 9px 0 rgba(169,184,200,.15);
+    -moz-box-shadow: 0 3px 9px 0 rgba(169,184,200,.15);
+} */

@@ -5,6 +5,17 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 const User = require("../model/user");
 const helper = require('../helper/helper')
+
+
+router.get('/users', (req,res)=>{
+  User.find({}).then(data =>{
+    return res.json({success: true, msg: `${data.length} users found`, data})
+  }).catch(err =>{
+    return res.json({success: true, msg: `error getting user from database`, err })
+
+  })
+})
+
 /*
 POST REQUEST
 SIGNUP, LOGIN 
@@ -82,7 +93,9 @@ router.put("/user/:id", passport.authenticate("jwt", {session: false}), (req, re
           user.department = req.body.department;        
           user.password = req.body.password;        
           user.ogID = req.body.ogID; 
-          user.role = req.body.role       
+          if(req.user.role == "Admin"){
+            user.role = req.body.role 
+          }    
           user.save(err => {
             if (err) {
               res.json({ success: false, message: err });
@@ -97,6 +110,23 @@ router.put("/user/:id", passport.authenticate("jwt", {session: false}), (req, re
     res.json({ success: false, message: 'unauthorized access denied' });
   }
 });
+/**
+ * Delte Account
+ */
 
+ router.delete('/delete-user/:id', passport.authenticate('jwt', {session: false}), (req,res) =>{
+   const token = helper.getToken(req.headers)
+   if(token && req.user.role == 'Admin'){
+     User.findByIdAndDelete({_id: req.params.id }, ((err,doc)=>{
+       if(err){
+         return res.json({success: false, msg: 'unable to delete user account', doc})
+        }else{
+          return res.json({success: true, msg: 'user deleted successfully', doc})
+
+       }
+     }))
+
+   }
+ })
 
 module.exports = router;

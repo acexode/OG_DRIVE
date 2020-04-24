@@ -249,6 +249,37 @@ router.post('/folder-to-folder', passport.authenticate("jwt", { session: false }
         res.json({success: false, message: 'unathorized'})
     }
 })
+
+/**
+ * Move folder from one to another
+ */
+router.post('/move-folder', passport.authenticate("jwt", { session: false }), function(req, res) {
+    const token = helper.getToken(req.headers);   
+    if(token){    
+        console.log(req.body.name)   
+        console.log(req.user._id) 
+        Folder.findOneAndRemove({user: req.user._id, name: req.body.name},         
+        ((err, resp) =>{
+            if(err){
+                return res.json({success: false, err, msg: 'unable to move to file'}); 
+            }else{
+                
+                Folder.findOneAndUpdate({user: req.user._id, name: req.body.dest},{ '$addToSet': { 'folders': resp },}, (err, update) =>{
+                    if(err){
+                        return res.json({success: false, err, msg: 'unable to move to folder'});
+                    }else{
+                        return res.status(200).send({success: true, msg: `Moved ${req.body.name} from  ${req.body.from}  to ${req.body.dest} folder Succesfully`});
+                        // return res.status(200).send({success: true, msg: `folder found`, doc});
+                    }
+                }) 
+            }
+        })
+        )
+        
+    }else{
+        res.json({success: false, message: 'unathorized'})
+    }
+})
 /**
  * 
  * Delete a a folder 

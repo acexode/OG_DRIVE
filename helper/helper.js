@@ -1,6 +1,7 @@
 const getToken = function (headers) {    
+  console.log(headers.authorization)
     if (headers && headers.authorization) {
-      var parted = headers.authorization.split(' ');      
+      var parted = headers.authorization.split(' ');  
       if (parted.length === 2) {
         return parted[1];
       } else {

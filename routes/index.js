@@ -46,19 +46,42 @@ var storage =  multer({
  * Get files belonging to  user 
  * 
  */
-router.get('/files', (req, res) =>{
+router.get('/files',passport.authenticate('jwt', { session: false}), (req, res) =>{
     var token = helper.getToken(req.headers)
-   
-    if (token) {
-        if(req.file){  
+    
+  
+    if (token) {        
             Files.find({user: req.user._id}, {}, (err, files)=>{
                 if(err){
                     return res.json({success: false, msg: 'no file found'});
                 }else{
-                    return res.status(200).send({success: true, msg: `found ${files.length} belonging to user`, files});
+                   
+                    return res.status(200).send({success: true, msg: `found ${files.length} files belonging to user`, files});
                 }
             }) 
-        }
+      
+    } else {
+        console.log('err')
+      return res.status(403).send({success: false, msg: 'Unauthorized.'});
+    }
+})
+/**
+ * 
+ * Get files belonging to  user 
+ * 
+ */
+router.get('/folders',passport.authenticate('jwt', { session: false}), (req, res) =>{
+    var token = helper.getToken(req.headers)     
+    if (token) {
+       
+            Folder.find({user: req.user._id}, {}, (err, folders)=>{
+                if(err){
+                    return res.json({success: false, msg: 'no file found'});
+                }else{                   
+                    return res.status(200).send({success: true, msg: `found ${folders.length} files belonging to user`, folders});
+                }
+            }) 
+      
     } else {
       return res.status(403).send({success: false, msg: 'Unauthorized.'});
     }
@@ -72,9 +95,12 @@ router.get('/files', (req, res) =>{
 
 router.post('/file', passport.authenticate('jwt', { session: false}),storage.single('file'), function(req, res) {
     var token = helper.getToken(req.headers)
-   
+   console.log('req.file')
+   console.log(req.files)
     if (token) {
-        if(req.file){           
+        if(req.file){ 
+            console.log('files')
+            console.log(req.file)          
             let file =new Files({
                 user: req.user._id,
                 location: req.file.location,
@@ -122,7 +148,28 @@ router.post('/files', passport.authenticate('jwt', { session: false}),storage.ar
       return res.status(403).send({success: false, msg: 'Unauthorized.'});
     }
   });
+/**
+ * 
+ *delete file 
+ * 
+ */
+router.post('/delete-file', passport.authenticate("jwt", { session: false }), function(req, res) {
+    const token = helper.getToken(req.headers);   
+    if(token){
+      
+        Files.findByIdAndDelete({_id: req.body._id},(err, doc)=>{
+            if(err){
+                return res.json({success: false, err, msg: 'unable to delete file'});
+            }else{
+                return res.status(200).send({success: true, msg: `file deleted successfully`, doc});
 
+            }
+        })
+        
+    }else{
+        res.json({success: false, message: 'unathorized'})
+    }
+})
 
   /**
  * 

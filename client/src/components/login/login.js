@@ -16,15 +16,17 @@ const Login  = () =>{
     onSubmit={(values, { setSubmitting }) => {
       setTimeout(() => {
         console.log("Logging in", values);
-        axios.post(`http://localhost:5000/api/login`,  values )
+        axios.post(`/login`,  values )
         .then(res => {
           console.log(res);
           console.log(res.data);
-          let user = {fullName: res.data.user.fullName, id: res.data.user._id}
-          localStorage.setItem("token", res.data.token)   
-          localStorage.setItem('department', res.data.user.department)
-          localStorage.setItem('fullname', res.data.user.fullName)
-          localStorage.setItem('ogID', res.data.user.ogID)         
+          let user = {fullName: res.data.user.fullname, id: res.data.user._id, department: res.data.user.department, ogID: res.data.user.ogID}
+          let token = res.data.token
+          console.log(token)
+          localStorage.setItem("token", token)   
+           localStorage.setItem('user', JSON.stringify(user))
+          // localStorage.setItem('fullname', res.data.user.fullName)
+          // localStorage.setItem('ogID', res.data.user.ogID)         
           history.push('/',{user: res.data.user})       
         })
         .catch(err =>{

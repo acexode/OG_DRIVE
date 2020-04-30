@@ -30,7 +30,8 @@ const Login  = () =>{
           history.push('/',{user: res.data.user})       
         })
         .catch(err =>{
-          console.log(err.response.data.message)
+          console.log(err.response)
+          console.log(err.response)
           setShow(true)
           setMessage(err.response.data.message)
         })	

@@ -2,6 +2,8 @@ import React, { useContext,useState,useCallback,useEffect } from 'react'
 import {FileContext} from '../FileContext/FileContext'
 import {useDropzone} from 'react-dropzone'
 import axios from 'axios'
+const $ = window.$
+console.log($)
 function getFile(filename, location) {      
     let spl = filename.split('.')
     let img = ['png','jpg', 'jpeg', 'gif', 'bmp']
@@ -48,27 +50,53 @@ const thumbsContainer = {
     width: 'auto',
     height: '100%'
   };
+
 const UploadFile = ({selectedFile}) => {
-     const [userfiles,folders,removeFile,moveFileFromRoot, createFolder,uploadFile, uploadFiles] = useContext(FileContext)
-    const [foldername, setfoldername] = useState('folder name')
+     const {uploadFile, uploadFiles} = useContext(FileContext)
+  
     const [errorMsg, setErrorMsg] = useState()
     const [sucessMsg, setsucessMsg] = useState()
     const [isSuccess, setisSuccess] = useState(false)
     const [isError, setisError] = useState(false)
     const [files, setFiles] = useState([]);
     const [myfiles, setmyFiles] = useState([]);
+    const removeSuccessAlert = () =>{
+      setTimeout(()=>{
+        $('#uploadFile').modal('toggle')
+        setisSuccess(false)
+        setFiles([])
+        setsucessMsg('')
+      },500)
+    }
+    const removeErrorAlert = () =>{
+      setTimeout(()=>{
+        $('#uploadFile').modal('toggle')
+        setisError(false)
+        setErrorMsg('')
+      },500)
+    }
     const {getRootProps, getInputProps} = useDropzone({    
       onDrop: acceptedFiles => {
           console.log(acceptedFiles)
           if(acceptedFiles.length == 1){
             const formData = new FormData();
-            acceptedFiles.forEach(file => {           
+            acceptedFiles.forEach(file => {     
+              file.folder = "root"
+              console.log(file)
               formData.append('file',file)           
-            })           
+            })  
+            // formData.append("folder", "root")   
+            // console.log(formData.getAll())      
             uploadFile(formData).then(data =>{
                 console.log(data)
                 setisSuccess(true)
                 setsucessMsg(data.msg)
+                removeSuccessAlert()
+            }).catch(err =>{
+              setisError(true)
+              setErrorMsg(err.response.data.msg)
+               removeErrorAlert()
+
             })
           }else{
             const formData = new FormData();
@@ -80,6 +108,11 @@ const UploadFile = ({selectedFile}) => {
                 console.log(data)
                 setisSuccess(true)
                 setsucessMsg(data.msg)
+                removeSuccessAlert()
+            }).catch(err =>{
+              setisError(true)
+              setErrorMsg(err.response.data.msg)
+              removeErrorAlert()
             })
           }
         setFiles(acceptedFiles.map(file => Object.assign(file, {

@@ -13,12 +13,13 @@ const FileSchema = Schema({
 
 
 const userSchema = Schema({
-    ogID: String,
-    password: String,
-    fullname: String,  
+    ogID: {type: String, unique: true, required: true},
+    password: {type: String, required: true},
+    fullname: {type: String, required: true},  
     department: String,
-    role: '',    
-    shared: [FileSchema]
+    role: {type:String, default: 'User'},    
+    sharedFile: [FileSchema],
+    sharedFolder: []
 })
 userSchema.pre("save", function(next){
     

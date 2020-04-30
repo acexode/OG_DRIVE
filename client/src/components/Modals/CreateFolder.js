@@ -1,13 +1,25 @@
-import React, { useContext,useState } from 'react'
+import React, { useContext,useState,useEffect } from 'react'
 import {FileContext} from '../FileContext/FileContext'
-const CreateFolder = ({selectedFile}) => {
-     const [files,folders,removeFile,moveFileFromRoot, createFolder] = useContext(FileContext)
-
+import { useLocation } from 'react-router-dom'
+const CreateFolder = ({}) => {
+     const {createFolder} = useContext(FileContext)
+      let location = useLocation()
+      console.log(location)
+     
     const [foldername, setfoldername] = useState('folder name')
+    const [isFolder, setisFolder] = useState()
+    
     const [errorMsg, setErrorMsg] = useState()
     const [sucessMsg, setsucessMsg] = useState()
     const [isSuccess, setisSuccess] = useState(false)
     const [isError, setisError] = useState(false)
+    
+    useEffect(() => {
+      setisFolder(location.pathname.includes("folder"))
+      
+    }, [isFolder])
+    console.log('isFolder', isFolder)
+    console.log('isFolder', location.pathname.slice(location.pathname.lastIndexOf("/") + 1))
     const handleSelectChange =(event) => {
         console.log(event.target.value)
         setfoldername(event.target.value)
@@ -20,10 +32,14 @@ const CreateFolder = ({selectedFile}) => {
             setTimeout(()=>{
                 setisError(false)
             },3000)
-        }else{
+        }else{         
             let obj = {
                 name: foldername
             }
+            if(isFolder){
+              obj.parent = location.pathname.slice(location.pathname.lastIndexOf("/") + 1)
+            }
+            console.log(obj)
 
             createFolder(obj).then(data =>{
                 console.log(data)

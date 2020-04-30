@@ -1,5 +1,4 @@
-const getToken = function (headers) {    
-  console.log(headers.authorization)
+const getToken = function (headers) {     
     if (headers && headers.authorization) {
       var parted = headers.authorization.split(' ');  
       if (parted.length === 2) {

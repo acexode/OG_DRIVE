@@ -7,9 +7,19 @@ const User = require("../model/user");
 const helper = require('../helper/helper')
 
 
-router.get('/users', (req,res)=>{
-  User.find({}).then(data =>{
-    return res.json({success: true, msg: `${data.length} users found`, data})
+router.get('/users', passport.authenticate('jwt', {session: false}), (req,res)=>{
+  User.find({}).then(users =>{
+    return res.json({success: true, msg: `${users.length} users found`, users})
+  }).catch(err =>{
+    return res.json({success: true, msg: `error getting user from database`, err })
+
+  })
+})
+
+
+router.get('/user', passport.authenticate('jwt', {session: false}), (req,res)=>{
+  User.findById({_id: req.user._id}).then(user =>{   
+    return res.json({success: true, msg: `user found`, user})
   }).catch(err =>{
     return res.json({success: true, msg: `error getting user from database`, err })
 
@@ -54,6 +64,7 @@ router.post("/signup", (req, res) => {
 //LOGIN
 router.post("/login", (req, res) => {  
   const {ogID, password} = req.body;
+  
   User.findOne({ ogID: req.body.ogID }, function(err, user) {
     if (err) {
       throw err;

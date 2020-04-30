@@ -32,8 +32,7 @@ var storage =  multer({
       metadata: function (req, file, cb) {
         cb(null, {fieldName: file.fieldname});
       },   
-      key: function (req, file, cb) {
-          console.log(file, 'from multerS3')
+      key: function (req, file, cb) {         
         cb(null, file.originalname)
       }
     })
@@ -93,26 +92,37 @@ router.get('/folders',passport.authenticate('jwt', { session: false}), (req, res
  * 
  */
 
-router.post('/file', passport.authenticate('jwt', { session: false}),storage.single('file'), function(req, res) {
+router.post('/file/:id', passport.authenticate('jwt', { session: false}),storage.single('file'), function(req, res) {
     var token = helper.getToken(req.headers)
-   console.log('req.file')
-   console.log(req.files)
+   
+   let folder = req.params.id 
     if (token) {
-        if(req.file){ 
-            console.log('files')
-            console.log(req.file)          
+        if(req.file){           
+                  
             let file =new Files({
                 user: req.user._id,
                 location: req.file.location,
                 filename: req.file.originalname
             })
-            file.save((err,file) =>{
-                if(err){
-                    return res.json({success: false, msg: 'unable to save file to db'});
-                }else{
-                    return res.status(200).send({success: true, msg: 'Saved to storage.', file});
-                }
-            })            
+            console.log(file)
+            if(folder == 'root'){
+                file.save((err,file) =>{
+                    if(err){
+                        return res.json({success: false, msg: 'unable to save file to db'});
+                    }else{
+                        return res.status(200).send({success: true, msg: 'Saved to storage.', file});
+                    }
+                })            
+
+            }else{
+                Folder.findByIdAndUpdate({_id: folder }, {$addToSet: {'files': file}}, (err, doc) =>{
+                    if(err){
+                        return res.json({success: false, msg: 'unable to save file to folder'});
+                    }else{
+                        return res.status(200).send({success: true, msg: 'Saved to storage.', file});
+                    }
+                })
+            }
         }
     } else {
       return res.status(403).send({success: false, msg: 'Unauthorized.'});
@@ -124,7 +134,7 @@ router.post('/file', passport.authenticate('jwt', { session: false}),storage.sin
  * Post bulk array of files * 
  * 
  */
-router.post('/files', passport.authenticate('jwt', { session: false}),storage.array('files'), function(req, res) {
+router.post('/files/:id', passport.authenticate('jwt', { session: false}),storage.array('files'), function(req, res) {
     var token = helper.getToken(req.headers)
     console.log(req.files)
     if (token) {
@@ -182,15 +192,27 @@ router.post('/folder', passport.authenticate("jwt", { session: false }), functio
         let folder = new Folder({
             user: req.user._id,
             name: req.body.name,
-            files: []
+            files: [],
+            sharedWith: []
         })
-        folder.save((err,doc) =>{
-            if(err){
-                return res.json({success: false, msg: 'unable to create new folder'});
-            }else{
-                return res.status(200).send({success: true, msg: 'Folder created successfully', doc});
-            }
-        })
+        if(req.body.parent != null){
+            Folder.findByIdAndUpdate({_id: req.body.parent}, {$addToSet: {'folders': folder}},(err, doc) =>{
+                if(err){
+                    return res.json({success: false, msg: 'unable to create new folder'});
+                }else{
+                    return res.status(200).send({success: true, msg: 'Folder created successfully', doc});
+                }
+            })
+        }else{
+            folder.save((err,doc) =>{
+                if(err){
+                    return res.json({success: false, msg: 'unable to create new folder'});
+                }else{
+                    return res.status(200).send({success: true, msg: 'Folder created successfully', doc});
+                }
+            })
+
+        }
     }else{
         res.json({success: false, message: 'unauthorized'})
     }
@@ -202,14 +224,15 @@ router.post('/folder', passport.authenticate("jwt", { session: false }), functio
  * Get Folder
  * 
  */
-router.get('/folder', passport.authenticate("jwt", { session: false }), function(req, res) {
+router.get('/folder/:id', passport.authenticate("jwt", { session: false }), function(req, res) {
     const token = helper.getToken(req.headers);   
+    console.log(req.params.id)
+    console.log(token)
     if(token){
-       
-        User.findOne({'folders.name': req.body.name}, (err, doc) =>{
+        Folder.findById({_id: req.params.id}, (err, doc) =>{
             if(err){
                 return res.json({success: false, msg: 'unable to find folder'});
-            }else{
+            }else{                
                 return res.status(200).send({success: true, msg: `folder found`, doc});
             }
         }) 
@@ -309,8 +332,7 @@ router.post('/move-folder', passport.authenticate("jwt", { session: false }), fu
         ((err, resp) =>{
             if(err){
                 return res.json({success: false, err, msg: 'unable to move to file'}); 
-            }else{
-                
+            }else{                
                 Folder.findOneAndUpdate({user: req.user._id, name: req.body.dest},{ '$addToSet': { 'folders': resp },}, (err, update) =>{
                     if(err){
                         return res.json({success: false, err, msg: 'unable to move to folder'});
@@ -336,10 +358,10 @@ router.post('/move-folder', passport.authenticate("jwt", { session: false }), fu
 router.post('/remove-folder', passport.authenticate("jwt", { session: false }), function(req, res) {
     const token = helper.getToken(req.headers);   
     if(token){     
-        Folder.findByIdAndRemove({_id: req.body.file}, (err) =>{
+        Folder.findByIdAndRemove({_id: req.body.id}, (err) =>{
             if(err){
                 console.log(err)
-                return res.json({success: false, err, msg: 'file deleted successfully'});
+                return res.json({success: false, err, msg: 'folder deleted successfully'});
             }else{      
                 return res.status(200).send({success: true, msg: `folder deleted`}); 
             }
@@ -355,22 +377,52 @@ router.post('/remove-folder', passport.authenticate("jwt", { session: false }), 
  * Share file  
  * 
  */
-router.post('/share', passport.authenticate("jwt", { session: false }), function(req, res) {
+router.post('/share-file', passport.authenticate("jwt", { session: false }), function(req, res) {
     const token = helper.getToken(req.headers);   
+    console.log(req.body)
     if(token){
-       
-        let file = {
-            user: req.user._id,
-            location: req.body.location,
-            filename: req.body.filename
-        }
-        User.findByIdAndUpdate({_id: req.body.colleague},{ '$addToSet': { 'shared': file } }, (err, doc) =>{
+        Files.findById({_id: req.body.fileId},(err, doc) =>{
             if(err){
                 return res.json({success: false, msg: 'unable to share file'});
+            }
+            User.findOneAndUpdate({ogID: req.body.friendId},{ '$addToSet': { 'sharedFile': doc } }, (err, doc) =>{
+                if(err){
+                    return res.json({success: false, msg: 'unable to share file'});
+                }else{
+                    return res.status(200).send({success: true, msg: 'File shared successfully'});
+                }
+            })
+
+        })
+    }else{
+        console.log('unauthorizeed')
+        res.json({success: false, message: 'unauthorized, token absent'})
+    }
+})
+/**
+ * 
+ * Share folder  
+ * 
+ */
+router.post('/share-folder', passport.authenticate("jwt", { session: false }), function(req, res) {
+    const token = helper.getToken(req.headers);   
+    if(token){      
+        console.log(req.body)
+        Folder.findById({_id: req.body.folderId},(err, doc) =>{            
+            if(err){
+                return res.json({success: false, msg: 'unable to share folder'});
             }else{
-                return res.status(200).send({success: true, msg: 'File shared successfully'});
+                User.findOneAndUpdate({ogID: req.body.friendId},{ '$addToSet': { 'sharedFolder': doc } }, (err, doc) =>{
+                    if(err){
+                        return res.json({success: false, msg: 'unable to share folder'});
+                    }else{
+                        return res.status(200).send({success: true, msg: 'Folder shared successfully'});
+                    }
+                })
+
             }
         })
+        
     }else{
         res.json({success: false, message: 'unauthorized, token absent'})
     }

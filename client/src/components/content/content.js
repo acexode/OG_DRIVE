@@ -73,8 +73,7 @@ const Content = () => {
                         </button>
                         <div className="dropdown-menu dropdown-menu-left">
                           <button className="dropdown-item" type="button">New Folder</button>
-                          <button className="dropdown-item" type="button">Upload File</button>
-                          <button className="dropdown-item" type="button">Upload Folder</button>
+                          <button className="dropdown-item" type="button">Upload File</button>                         
                         </div>
                       </div>
                 </div>

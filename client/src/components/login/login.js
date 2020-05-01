@@ -124,6 +124,7 @@ const Login  = () =>{
                 <button className="btn btn-primary account-btn" disabled={isSubmitting} type="submit">Login</button>
               </div>								
             </form>
+              <a mt-3 className="text-primary" href="/signup">Not a user ? Sign up</a>
           
             
           </div>

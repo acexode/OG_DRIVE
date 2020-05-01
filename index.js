@@ -34,7 +34,7 @@ mongoose.connect(  process.env.MONGODBURI,{
   app.use(bodyParser.urlencoded({extended: false}))
   
   app.use(passport.initialize())
-  app.use('/api', auth)
+  app.use('/', auth)
   app.use('/api', routes)
 
   if(process.env.NODE_ENV === 'production'){

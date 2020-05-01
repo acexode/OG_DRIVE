@@ -16,7 +16,7 @@ const Login  = () =>{
     onSubmit={(values, { setSubmitting }) => {
       setTimeout(() => {
         console.log("Logging in", values);
-        axios.post(`/login`,  values )
+        axios.post(`/api/login`,  values )
         .then(res => {
           console.log(res);
           console.log(res.data);

@@ -7,7 +7,7 @@ const User = require("../model/user");
 const helper = require('../helper/helper')
 
 
-router.get('/users', passport.authenticate('jwt', {session: false}), (req,res)=>{
+router.get('/api/users', passport.authenticate('jwt', {session: false}), (req,res)=>{
   User.find({}).then(users =>{
     return res.json({success: true, msg: `${users.length} users found`, users})
   }).catch(err =>{
@@ -17,7 +17,7 @@ router.get('/users', passport.authenticate('jwt', {session: false}), (req,res)=>
 })
 
 
-router.get('/user', passport.authenticate('jwt', {session: false}), (req,res)=>{
+router.get('/api/user', passport.authenticate('jwt', {session: false}), (req,res)=>{
   User.findById({_id: req.user._id}).then(user =>{   
     return res.json({success: true, msg: `user found`, user})
   }).catch(err =>{
@@ -31,7 +31,7 @@ POST REQUEST
 SIGNUP, LOGIN 
 */
 
-router.post("/signup", (req, res) => {
+router.post("/api/signup", (req, res) => {
  
   if (!req.body.ogID ||  !req.body.fullname || !req.body.password || !req.body.department) {
     res.json({
@@ -62,7 +62,7 @@ router.post("/signup", (req, res) => {
 
 
 //LOGIN
-router.post("/login", (req, res) => {  
+router.post("/api/login", (req, res) => {  
   const {ogID, password} = req.body;
   
   User.findOne({ ogID: req.body.ogID }, function(err, user) {

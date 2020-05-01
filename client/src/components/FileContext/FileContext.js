@@ -20,7 +20,7 @@ export const FileProvider = (props) => {
 
  const fetchUser =() =>{
   
-  axios.get("/user",{headers: {'Authorization': `Bearer ${token}`}})
+  axios.get("/api/user",{headers: {'Authorization': `Bearer ${token}`}})
   .then(res => { 
     console.log(res.data)
     setcurrUser(res.data.user)
@@ -31,7 +31,7 @@ export const FileProvider = (props) => {
  }
  const fetchUsers =() =>{
   
-  axios.get("/users",{headers: {'Authorization': `Bearer ${token}`}})
+  axios.get("/api/users",{headers: {'Authorization': `Bearer ${token}`}})
   .then(res => {   
     console.log(res.data) 
     setusers(res.data.users)
@@ -42,7 +42,7 @@ export const FileProvider = (props) => {
  }
  const fetchUserFiles =() =>{
    console.log('from fetxh')
-  axios.get("/files",{headers: {'Authorization': `Bearer ${token}`}})
+  axios.get("/api/files",{headers: {'Authorization': `Bearer ${token}`}})
   .then(res => {
     console.log(res.data)
     setFiles(res.data.files)
@@ -54,7 +54,7 @@ export const FileProvider = (props) => {
  }
  const fetchUserFolders =() =>{
    console.log('from fetxh')
-  return axios.get("/folders",{headers: {'Authorization': `Bearer ${token}`}})
+  return axios.get("/api/folders",{headers: {'Authorization': `Bearer ${token}`}})
   .then(res => {
     console.log(res.data)
     setfolders(res.data.folders)
@@ -66,7 +66,7 @@ export const FileProvider = (props) => {
  }
  const fetchUserFolder =(id) =>{
    console.log('id',id)
-  return axios.get(`/folder/${id}`,{headers: {'Authorization': `Bearer ${token}`}})
+  return axios.get(`/api/folder/${id}`,{headers: {'Authorization': `Bearer ${token}`}})
   .then(res => {
     console.log(res.data)
     return res.data
@@ -78,7 +78,7 @@ export const FileProvider = (props) => {
  }
  const shareFile = (obj) =>{  
   const token = localStorage.getItem('token')
-  return axios.post('/share-file',obj, {headers: {'Authorization': `Bearer ${token}`}})
+  return axios.post('/api/share-file',obj, {headers: {'Authorization': `Bearer ${token}`}})
   .then(res =>{
       console.log(res.data)
      return res.data 
@@ -89,7 +89,7 @@ export const FileProvider = (props) => {
 }
  const removeFile = (id) =>{  
   const token = localStorage.getItem('token')
-  axios.post('/delete-file',{_id:id}, {headers: {'Authorization': `Bearer ${token}`}})
+  axios.post('/api/delete-file',{_id:id}, {headers: {'Authorization': `Bearer ${token}`}})
   .then(res =>{
       console.log(res.data)
       fetchUserFiles()      
@@ -99,7 +99,7 @@ export const FileProvider = (props) => {
 }
  const removeFolder = (id) =>{  
   const token = localStorage.getItem('token')
-  axios.post('/remove-folder',{id:id}, {headers: {'Authorization': `Bearer ${token}`}})
+  axios.post('/api/remove-folder',{id:id}, {headers: {'Authorization': `Bearer ${token}`}})
   .then(res =>{
       console.log(res.data)
       fetchUserFolders()      
@@ -109,7 +109,7 @@ export const FileProvider = (props) => {
 }
 const shareFolder = (obj) =>{  
   const token = localStorage.getItem('token')
-  return axios.post('/share-folder',obj, {headers: {'Authorization': `Bearer ${token}`}})
+  return axios.post('/api/share-folder',obj, {headers: {'Authorization': `Bearer ${token}`}})
   .then(res =>{
       console.log(res.data)
      return res.data 
@@ -120,7 +120,7 @@ const shareFolder = (obj) =>{
 }
  const moveFileFromRoot = (obj) =>{  
   const token = localStorage.getItem('token')
-  axios.post('/root-to-folder',obj, {headers: {'Authorization': `Bearer ${token}`}})
+  axios.post('/api/root-to-folder',obj, {headers: {'Authorization': `Bearer ${token}`}})
   .then(res =>{
       console.log(res.data)
       fetchUserFiles()
@@ -133,7 +133,7 @@ const shareFolder = (obj) =>{
 }
  const moveFolder = (obj) =>{  
   const token = localStorage.getItem('token')
- return axios.post('/move-folder',obj, {headers: {'Authorization': `Bearer ${token}`}})
+ return axios.post('/api/move-folder',obj, {headers: {'Authorization': `Bearer ${token}`}})
   .then(res =>{
       console.log(res.data)
       fetchUserFiles()
@@ -146,7 +146,7 @@ const shareFolder = (obj) =>{
 }
  const createFolder = (obj) =>{  
   const token = localStorage.getItem('token')
-  return  axios.post('/folder',obj, {headers: {'Authorization': `Bearer ${token}`}})
+  return  axios.post('/api/folder',obj, {headers: {'Authorization': `Bearer ${token}`}})
   .then(res =>{
       console.log(res.data)     
       fetchUserFolders()
@@ -159,7 +159,7 @@ const shareFolder = (obj) =>{
  const uploadFile = (obj, folder='root') =>{  
   const token = localStorage.getItem('token')
   console.log(obj.get('file'))
-  return axios.post(`/file/${folder}`,obj, {headers: {'Authorization': `Bearer ${token}`}})
+  return axios.post(`/api/file/${folder}`,obj, {headers: {'Authorization': `Bearer ${token}`}})
   .then(res =>{
       console.log(res.data) 
       if(folder == 'root'){
@@ -178,7 +178,7 @@ const shareFolder = (obj) =>{
  const uploadFiles = (obj,folder='root') =>{  
    console.log(obj)
   const token = localStorage.getItem('token')
-  return  axios.post(`/files/${folder}`,obj, {headers: {'Authorization': `Bearer ${token}`}})
+  return  axios.post(`/api/files/${folder}`,obj, {headers: {'Authorization': `Bearer ${token}`}})
   .then(res =>{
       console.log(res.data)
       fetchUserFiles()     

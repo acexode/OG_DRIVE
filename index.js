@@ -36,9 +36,7 @@ mongoose.connect(  process.env.MONGODBURI,{
   app.use(passport.initialize())
   app.use('/api', auth)
   app.use('/api', routes)
-  app.get('/', (req, res) => {
-    res.status(200).json({ message: 'welcome to OG DRIVE' });
-  })
+
   if(process.env.NODE_ENV === 'production'){
     app.use(express.static(path.join(__dirname, 'client/build')));
     app.get('*', (req,res) =>{

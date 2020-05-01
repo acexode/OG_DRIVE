@@ -1,6 +1,7 @@
 import React, { useContext,useState,useEffect } from 'react'
 import {FileContext} from '../FileContext/FileContext'
 import { useLocation } from 'react-router-dom'
+const $ = window.$
 const CreateFolder = ({}) => {
      const {createFolder} = useContext(FileContext)
       let location = useLocation()
@@ -13,7 +14,20 @@ const CreateFolder = ({}) => {
     const [sucessMsg, setsucessMsg] = useState()
     const [isSuccess, setisSuccess] = useState(false)
     const [isError, setisError] = useState(false)
-    
+    const removeSuccessAlert = () =>{
+      setTimeout(()=>{
+        $('#exampleModal').modal('toggle')
+        setisSuccess(false)         
+        setsucessMsg('')
+      },500)
+    }
+    const removeErrorAlert = () =>{
+      setTimeout(()=>{
+        $('#exampleModal').modal('toggle')
+        setisError(false)
+        setErrorMsg('')
+      },500)
+    }
     useEffect(() => {
       setisFolder(location.pathname.includes("folder"))
       
@@ -42,9 +56,16 @@ const CreateFolder = ({}) => {
             console.log(obj)
 
             createFolder(obj).then(data =>{
-                console.log(data)
+              if(data.success){
                 setisSuccess(true)
                 setsucessMsg(data.msg)
+                removeSuccessAlert()
+
+            }else{
+                setisError(true)
+                setErrorMsg(data.msg)
+                removeErrorAlert()
+            }
             })
         }
       

@@ -6,10 +6,12 @@ import { FileContext } from '../FileContext/FileContext'
 import {getFile} from '../helper/helper'
 import Uploader from '../helper/uploader'
 import CreateFolder from '../Modals/CreateFolder'
+import Preview from '../Modals/preview'
 const Folder = ({location}) => {
     const {fetchUserFolder, removeFile} =  useContext(FileContext)    
     const [files, setfiles] = useState([])
     const [folders, setfolders] = useState()
+    const [url, seturl] = useState()
     const deleteFile = (e, id) =>{
         e.preventDefault()
         const token = localStorage.getItem('token')
@@ -61,7 +63,7 @@ const Folder = ({location}) => {
                     { files &&  files.map(file =>(
                         <div key={file._id} className="col-md-4">
                         <div className="card ">
-                            <img className="card-img-top" src={getFile(file.filename, file.location)} />
+                        <img onClick={() => seturl(file.location)} data-toggle="modal" data-target="#previewModal" className="card-img-top" src={getFile(file.filename, file.location)} />
                         <div className="text-center card-info"> 
                             <p className="pr-5">{file.filename}</p>
                             <div className="">                           
@@ -149,6 +151,7 @@ const Folder = ({location}) => {
             }
            
            <CreateFolder />
+           <Preview file_url={url} />
         </div>
         
         </div>

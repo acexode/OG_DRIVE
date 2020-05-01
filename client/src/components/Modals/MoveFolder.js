@@ -13,14 +13,14 @@ const MoveFolder = ({selectedFolder}) => {
 
     const removeSuccessAlert = () =>{
         setTimeout(()=>{
-          $('#uploadFile').modal('toggle')
+          $('#moveFolder').modal('toggle')
           setisSuccess(false)         
           setsucessMsg('')
         },500)
       }
       const removeErrorAlert = () =>{
         setTimeout(()=>{
-          $('#uploadFile').modal('toggle')
+          $('#moveFolder').modal('toggle')
           setisError(false)
           setErrorMsg('')
         },500)
@@ -36,11 +36,16 @@ const MoveFolder = ({selectedFolder}) => {
             dest: selected
         }
         moveFolder(obj).then(data =>{
+          if(data.success){
             setisSuccess(true)
             setsucessMsg(data.msg)
-        }).catch(err =>{
-          setisError(true)
-          setErrorMsg(err.response.data.msg)
+            removeSuccessAlert()
+
+        }else{
+            setisError(true)
+            setErrorMsg(data.msg)
+            removeErrorAlert()
+        }
         })
     }
    

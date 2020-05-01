@@ -1,9 +1,27 @@
 import React, { useContext,useState } from 'react'
 import {FileContext} from '../FileContext/FileContext'
+const $ = window.$
 const Move = ({selectedFile}) => {
     const {folders,moveFileFromRoot} = useContext(FileContext)
     const [selected, setselected] = useState()
-    // let selected = ''
+    const [errorMsg, setErrorMsg] = useState()
+    const [sucessMsg, setsucessMsg] = useState()
+    const [isSuccess, setisSuccess] = useState(false)
+    const [isError, setisError] = useState(false)
+    const removeSuccessAlert = () =>{
+      setTimeout(()=>{
+        $('#moveFolder').modal('toggle')
+        setisSuccess(false)         
+        setsucessMsg('')
+      },500)
+    }
+    const removeErrorAlert = () =>{
+      setTimeout(()=>{
+        $('#moveFolder').modal('toggle')
+        setisError(false)
+        setErrorMsg('')
+      },500)
+    }
     const handleSelectChange =(event) => {
       
         setselected(event.target.value)
@@ -14,7 +32,18 @@ const Move = ({selectedFile}) => {
             ...selectedFile,
             folder: selected
         }
-        moveFileFromRoot(obj)
+        moveFileFromRoot(obj).then(data =>{
+          if(data.success){
+            setisSuccess(true)
+            setsucessMsg(data.msg)
+            removeSuccessAlert()
+
+        }else{
+            setisError(true)
+            setErrorMsg(data.msg)
+            removeErrorAlert()
+        }
+        })
     }
    
     return (

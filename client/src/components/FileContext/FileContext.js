@@ -42,6 +42,7 @@ export const FileProvider = (props) => {
  }
  const fetchUserFiles =() =>{
    console.log('from fetxh')
+   console.log(token)
   axios.get("/api/files",{headers: {'Authorization': `Bearer ${token}`}})
   .then(res => {
     console.log(res.data)
@@ -120,7 +121,7 @@ const shareFolder = (obj) =>{
 }
  const moveFileFromRoot = (obj) =>{  
   const token = localStorage.getItem('token')
-  axios.post('/api/root-to-folder',obj, {headers: {'Authorization': `Bearer ${token}`}})
+  return axios.post('/api/root-to-folder',obj, {headers: {'Authorization': `Bearer ${token}`}})
   .then(res =>{
       console.log(res.data)
       fetchUserFiles()

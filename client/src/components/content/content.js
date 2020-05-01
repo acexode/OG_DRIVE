@@ -23,8 +23,9 @@ const Content = () => {
     console.log(currUser)
     const deleteFile = (e, id) =>{
         e.preventDefault()
+        console.log(id)
         const token = localStorage.getItem('token')
-        removeFolder(id)
+        removeFile(id)
     }
     const deleteFolder = (e, id) =>{
         e.preventDefault()
@@ -101,8 +102,8 @@ const Content = () => {
                             <div className="">                           
                             <a href={file.location} id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i className="las la-ellipsis-v"></i></a>
                             <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a href={file.location} className="dropdown-item" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} href="#"><i className="las la-download"></i><p>Download</p></a>
-                            <a onClick={(e) => deleteFile(e, file._id)} className="dropdown-item" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} href="#"><i className="las la-trash"></i><p>Delete</p></a>
+                            <a href={file.location} className="dropdown-item" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} ><i className="las la-download"></i><p>Download</p></a>
+                            <a onClick={(e) => deleteFile(e, file._id)} className="dropdown-item" style={{display:'flex',padding:'0px', paddingLeft:'5px'}}><i className="las la-trash"></i><p>Delete</p></a>
                             <a onClick={() => setselectedFile(file)} className="dropdown-item" data-toggle="modal" data-target=".bd-example-modal-sm" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} href="#"><i className="las la-folder-plus"></i><p>Move to</p></a>
                             <a onClick={() => setselectedFile(file)} className="dropdown-item" data-toggle="modal" data-target="#shareFile" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} href="#"><i className="las la-user-plus"></i><p>Share</p></a>
                            

@@ -76,7 +76,7 @@ router.post("/login", (req, res) => {
       // console.log(process.env.SECRET);
       user.comparePassword(password, function(err, match) {        
         if (match && !err) {
-          let token = jwt.sign(user.toJSON(), process.env.SECRET,{expiresIn:'24hr'});
+          let token = jwt.sign(user.toJSON(), process.env.SECRET,{expiresIn:'365d'});
           console.log(jwt.decode(token))
           res.json({success: true, token, user});
         } else {

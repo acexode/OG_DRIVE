@@ -15,18 +15,18 @@ import Recent from './components/content/recent';
 import Starred from './components/content/starred';
 var jwtDecode = require('jwt-decode');
 // let history = useHistory()  
-const token = localStorage.getItem('token')
-const lastclear = localStorage.getItem('LastClear')
-let exp = {...jwtDecode(token)}
+// const token = localStorage.getItem('token')
+// const lastclear = localStorage.getItem('LastClear')
+// let exp = {...jwtDecode(token)}
 
 const Main = withRouter(({ location }) => {
-  let history = useHistory()  
-  if((exp.exp * 1000) < (new Date()).getTime()){
-    localStorage.removeItem('token')
-    history.push('/login')
-  }else{
-    console.log('greater')
-  }
+  // let history = useHistory()  
+  // if((exp.exp * 1000) < (new Date()).getTime()){
+  //   localStorage.removeItem('token')
+  //   history.push('/login')
+  // }else{
+  //   console.log('greater')
+  // }
 
   
     return (

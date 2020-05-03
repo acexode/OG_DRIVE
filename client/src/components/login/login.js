@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import logo from '../../assets/outsource-logo-square.png';
 import './login.css'
 import axios from "axios";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useHistory } from 'react-router-dom';
+import { FileContext } from '../FileContext/FileContext';
 
 const Login  = () =>{
+  const {fetchUserFiles,fetchUserFolder} = useContext(FileContext)
   let history = useHistory()
   const [message,setMessage] = useState('')
   const [show,setShow] = useState(false)
@@ -21,17 +23,19 @@ const Login  = () =>{
           console.log(res);
           console.log(res.data);
           let user = {fullName: res.data.user.fullname, id: res.data.user._id, department: res.data.user.department, ogID: res.data.user.ogID}
+          let Time_now = (new Date()).getTime()
           let token = res.data.token
           console.log(token)
           localStorage.setItem("token", token)   
-           localStorage.setItem('user', JSON.stringify(user))
-          // localStorage.setItem('fullname', res.data.user.fullName)
+          localStorage.setItem('user', JSON.stringify(user))
+          localStorage.setItem('LastClear', Time_now)
+          fetchUserFiles()
+          fetchUserFolder()
           // localStorage.setItem('ogID', res.data.user.ogID)         
           history.push('/',{user: res.data.user})       
         })
-        .catch(err =>{
-          console.log(err.response)
-          console.log(err.response)
+        .catch(err =>{         
+          
           setShow(true)
           setMessage(err.response.data.message)
         })	

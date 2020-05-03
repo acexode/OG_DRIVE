@@ -27,20 +27,16 @@ const ShareFile = ({fileId}) => {
       }
     useEffect(() => {
     }, [fileId])
-    console.log(fileId)
-    const handleSelectChange =(event) => {
-        console.log(event.target.value)
+ 
+    const handleSelectChange =(event) => {       
         setuserOgId(event.target.value)
     }
     const onsubmit= (e) =>{
-        e.preventDefault();
-        console.log(fileId._id)
-        console.log(userOgId)
+        e.preventDefault();      
         let obj ={
             fileId : fileId._id,
             friendId: userOgId
-        }
-        console.log(obj)
+        }      
         shareFile(obj).then(data =>{
             if(data.success){
                 setisSuccess(true)

@@ -1,9 +1,23 @@
 import React, { useContext,useState,useEffect } from 'react'
 import {FileContext} from '../FileContext/FileContext'
 const Preview = ({file_url}) => {
-    const {folders,moveFileFromRoot} = useContext(FileContext)
+    const {files} = useContext(FileContext)
     const [selected, setselected] = useState()
-    // let selected = ''
+    const [loaded, setloaded] = useState(false)
+    if(file_url){
+        let recentFile = files.filter(f => f.location == file_url)       
+        if(localStorage.getItem('recentFile')){
+            // console.log(recentFile)
+            let recent = JSON.parse(localStorage.getItem('recentFile'))
+            recent.push(recentFile[0].location)
+            let unique = [...new Set(recent)]                       
+            localStorage.setItem('recentFile', JSON.stringify(unique))
+        }else{
+            // console.log(recentFile)
+            localStorage.setItem('recentFile', JSON.stringify([recentFile[0].location]))
+        }
+
+    }
     let imgs = ["gif", "jpeg", "png", "jpg"];
     const isImage = (file) =>{
         if(file){
@@ -17,8 +31,7 @@ const Preview = ({file_url}) => {
     }
     useEffect(() => {
         
-    }, [file_url])
-    console.log(file_url)
+    }, [])    
     const handleSelectChange =(event) => {
       
         setselected(event.target.value)
@@ -38,7 +51,7 @@ const Preview = ({file_url}) => {
                 <div className="modal-body"> 
                     {isImage(file_url) ?
                     <img style={{width: '100%'}}  src={file_url} />:
-                    <iframe  width="100%" height="600" frameborder="0" src={`https://docs.google.com/gview?url=${file_url}&embedded=true`}></iframe>
+                    <iframe  width="100%" height="600" frameBorder="0" src={`https://docs.google.com/gview?url=${file_url}&embedded=true`}></iframe>
                 }                   
                            
                 </div>

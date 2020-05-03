@@ -14,4 +14,9 @@ $(document).ready(function () {
         $(this).toggleClass('btn-file-active');
         
     });
+    $('.sidebar-link').on('click', function () {
+        $('.sidebar-link').removeClass('active');
+        $(this).toggleClass('active');
+        
+    });
 });

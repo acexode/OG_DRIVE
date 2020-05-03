@@ -1,4 +1,5 @@
 import React, { useContext, useEffect,useState } from 'react'
+import Sidebar from '../sidebar/sidebar'
 import Header from '../header/header'
 import { Link } from 'react-router-dom'
 import { FileContext } from '../FileContext/FileContext'
@@ -6,62 +7,61 @@ import {getFile} from '../helper/helper'
 import Uploader from '../helper/uploader'
 import CreateFolder from '../Modals/CreateFolder'
 import Preview from '../Modals/preview'
-import UploadFile from '../Modals/UploadFile'
-const Folder = ({location}) => {
-    const {fetchUserFolder, removeFile} =  useContext(FileContext)    
-    const [files, setfiles] = useState([])
+const Trash = ({location}) => {
+    const {fetchUserTrashes, removeFile,currUser, sharedFiles, sharedFolders} =  useContext(FileContext)    
+    const [files, setfiles] = useState()
     const [folders, setfolders] = useState()
+    const [isFiles, setisFiles] = useState(false)
     const [url, seturl] = useState()
+    console.log(sharedFiles)
     const deleteFile = (e, id) =>{
         e.preventDefault()
-       
+        const token = localStorage.getItem('token')
         removeFile(id)
     }
-
+    
     const [selectedFile, setselectedFile] = useState()
     
     
  
     const id = location.pathname.slice(location.pathname.lastIndexOf("/") + 1)
     useEffect(() => {
-        fetchUserFolder(id).then(res =>{
-            console.log(res)
-            setfiles(res.doc.files)
-            setfolders(res.doc.folders)
-        }).catch(err =>{
-            console.log(err)
+
+        fetchUserTrashes().then(data =>{
+            console.log(data)
+            setfiles(data.trashes)
         })
+        console.log(files == undefined)
+        if(files == undefined){
+            setisFiles(false)
+        }else{
+            console.log(files.length)
+            if(files.length == 0){
+                setisFiles(false)
+            }else{
+
+                setisFiles(true)
+            }
+        }
+        // setfiles(sharedFiles)
+        // setfolders(sharedFolders)
+       
         
     }, [])
-    console.log(id)
+  
     return (
         <div id="content">       
         <Header />
-        <div className="container">
-            <div className="row">
-                <div className="col-md-8">
-                    <div className="btn-group">
-                        <button type="button" className="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          My Drive
-                        </button>
-                        <div className="dropdown-menu dropdown-menu-left">
-                          <button className="dropdown-item" type="button">New Folder</button>
-                          <button className="dropdown-item" type="button">Upload File</button>
-                          <button className="dropdown-item" type="button">Upload Folder</button>
-                        </div>
-                      </div>
-                </div>               
-            </div>
-            {files.length >0 ?
-            <>
+        <div className="container">           
+            { files ? <>
                 <div className="row mt-5 mb-2">
                    <div className="col-md-12 ml-4">
-                   <h5 className="text-secondary">Files</h5>
+                    { files && <h5 className="text-secondary">Files</h5> }
                    </div>
-                    { files &&  files.map(file =>(
+                   { files &&  files.map(file =>(
                         <div key={file._id} className="col-md-4">
                         <div className="card ">
-                        <img onClick={() => seturl(file.location)} data-toggle="modal" data-target="#previewModal" className="card-img-top" src={getFile(file.filename, file.location)} />
+                        <img onClick={() => seturl(file.location)} data-toggle="modal" data-target="#previewModal" className="card-img-top" src={getFile(file.files.filename, file.files.location)} />
                         <div className="text-center card-info"> 
                             <p className="pr-5">{file.filename}</p>
                             <div className="">                           
@@ -80,9 +80,19 @@ const Folder = ({location}) => {
 
                     ))}
                 </div>
+            
+            </>: 
+                 <div className="row mt-5 mb-2">
+                 <div className="col-md-12 ml-4" style={{marginTop:'8em'}}>
+                   <h5 className="text-secondary text-center">Trash is Empty </h5> 
+                 </div>
+                
+              </div>
+            
+            }
                  <div className="row">
                  <div className="col-md-12 ml-4">
-                   <h5 className="text-secondary">Folders</h5>
+                   {folders && <h5 className="text-secondary">Folders</h5>}
                    </div>
                      {folders && folders.map(folder => (
                           <div key={folder._id} className="col-md-4">
@@ -138,18 +148,12 @@ const Folder = ({location}) => {
                               </Link>
                       </div>
                      ))}
+                    
                 </div>
             
-            </> :
-            <>
-                <Uploader id={id} />
-            
-            </>
-            
-            }
+         
            
            <CreateFolder />
-           <UploadFile id={id} />
            <Preview file_url={url} />
         </div>
         
@@ -157,4 +161,4 @@ const Folder = ({location}) => {
     )
 }
 
-export default Folder
+export default Trash

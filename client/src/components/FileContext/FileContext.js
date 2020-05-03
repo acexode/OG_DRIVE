@@ -10,23 +10,29 @@ export const FileProvider = (props) => {
   const [shared, setshared] = useState([])
   const [users, setusers] = useState([])
   const [currUser, setcurrUser] = useState()
+  const [sharedFiles, setsharedFiles] = useState()
+  const [sharedFolders, setsharedFolders] = useState()
   useEffect(()=>{
     console.log('object')
+    fetchUser()
     fetchUserFiles()
     fetchUserFolders()
     fetchUsers()
-    fetchUser()
   },[])
 
  const fetchUser =() =>{
   
-  axios.get("/api/user",{headers: {'Authorization': `Bearer ${token}`}})
+  return axios.get("/api/user",{headers: {'Authorization': `Bearer ${token}`}})
   .then(res => { 
     console.log(res.data)
     setcurrUser(res.data.user)
+    setsharedFiles(res.data.user.sharedFile)
+    setsharedFiles(res.data.user.sharedFolder)
+    return res.data
    
   }).catch(err =>{
       console.log(err.response)
+      return err.response
     })
  }
  const fetchUsers =() =>{
@@ -62,6 +68,17 @@ export const FileProvider = (props) => {
     
   }
     ).catch(err =>{
+      console.log(err.response)
+    })
+ }
+ const fetchUserTrashes =() =>{
+   console.log('from fetxh')
+  return axios.get("/api/trashes",{headers: {'Authorization': `Bearer ${token}`}})
+  .then(res => {
+    console.log(res.data)
+    return res.data
+    
+  }).catch(err =>{
       console.log(err.response)
     })
  }
@@ -163,6 +180,16 @@ const shareFolder = (obj) =>{
   return axios.post(`/api/file/${folder}`,obj, {headers: {'Authorization': `Bearer ${token}`}})
   .then(res =>{
       console.log(res.data) 
+      if(localStorage.getItem('recentFile')){
+        // console.log(recentFile)
+        let recent = JSON.parse(localStorage.getItem('recentFile'))
+        recent.push(res.data.file.location)
+        let unique = [...new Set(recent)]                       
+        localStorage.setItem('recentFile', JSON.stringify(unique))
+    }else{
+        // console.log(recentFile)
+        localStorage.setItem('recentFile', JSON.stringify([res.data.file.location]))
+    }
       if(folder == 'root'){
         fetchUserFiles()   
       } else{
@@ -182,7 +209,11 @@ const shareFolder = (obj) =>{
   return  axios.post(`/api/files/${folder}`,obj, {headers: {'Authorization': `Bearer ${token}`}})
   .then(res =>{
       console.log(res.data)
-      fetchUserFiles()     
+      if(folder == 'root'){
+        fetchUserFiles()   
+      } else{
+        fetchUserFolder(folder)
+      }   
       return res.data
   }).catch(err =>{
       console.log(err.response)
@@ -191,7 +222,10 @@ const shareFolder = (obj) =>{
 }
 
 return <FileContext.Provider
- value={{currUser,users,files, folders, removeFile,moveFileFromRoot,createFolder, uploadFile, uploadFiles,fetchUserFolder,moveFolder, removeFolder,shareFile, shareFolder}}
+ value=
+ {{currUser,users,files, folders,fetchUserFiles,fetchUserFolder, removeFile,moveFileFromRoot,createFolder, uploadFile, 
+  uploadFiles,fetchUserFolder,moveFolder, removeFolder,shareFile, shareFolder, sharedFiles,sharedFolders, fetchUserTrashes
+}}
  >{props.children}</FileContext.Provider>
  
 };

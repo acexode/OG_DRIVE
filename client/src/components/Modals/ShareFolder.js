@@ -27,20 +27,16 @@ const ShareFolder = ({folder}) => {
       }
     useEffect(() => {
     }, [folder])
-    console.log(folder)
-    const handleSelectChange =(event) => {
-        console.log(event.target.value)
+  
+    const handleSelectChange =(event) => {      
         setuserOgId(event.target.value)
     }
     const onsubmit= (e) =>{
-        e.preventDefault();
-        console.log(folder._id)
-        console.log(userOgId)
+        e.preventDefault();        
         let obj ={
             folderId : folder,
             friendId: userOgId
-        }
-        console.log(obj)
+        }      
         shareFolder(obj).then(data =>{
             if(data.success){
                 setisSuccess(true)

@@ -8,7 +8,7 @@ import Move from '../Modals/Move'
 import CreateFolder from '../Modals/CreateFolder'
 import UploadFile from '../Modals/UploadFile'
 import { Link } from 'react-router-dom'
-import {getFile} from '../helper/helper'
+import {getFile, typeofFile} from '../helper/helper'
 import Preview from '../Modals/preview'
 import MoveFolder from '../Modals/MoveFolder'
 import ShareFile from '../Modals/ShareFile'
@@ -20,7 +20,8 @@ const Content = () => {
     let file_url = "https://outsourcedrive.s3.amazonaws.com/production_tree.xlsx"
     const {files,folders,removeFile,fetchUserFolder,removeFolder,currUser} = useContext(FileContext)
     const token = localStorage.getItem('token')
-    console.log(currUser)
+
+  
     const deleteFile = (e, id) =>{
         e.preventDefault()
         console.log(id)
@@ -121,7 +122,7 @@ const Content = () => {
                    </div>
                      { folders.map(folder => (                         
                               
-                        <div className="cards__item">
+                        <div  key={folder._id} className="cards__item">
                               
                           <div className="card">
                           <div className="card__content">
@@ -154,12 +155,15 @@ const Content = () => {
                 </div>
                 <div className="card__type">
                     <div className="card__left_type">
-                        <p>Type of File</p>
+                        <p>Type of File(s)</p>                        
                     </div>
                     <div className="card__right card__img">
-                        <img src="https://www.gstatic.com/images/branding/product/2x/docs_48dp.png" alt="" />
-                        <img src="https://www.gstatic.com/images/branding/product/2x/sheets_48dp.png" alt="" />
-                        <img src="https://www.gstatic.com/images/branding/product/2x/slides_48dp.png" alt="" />
+                        
+                        {folder.files.map(file =>(
+                            <img src={typeofFile(file.filename)} alt="" />
+
+                        ))}
+                        
                     </div>
 
                 </div>                
@@ -173,7 +177,7 @@ const Content = () => {
                             <a href={folder.location} className="dropdown-item" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} href="#"><i className="las la-download"></i><p>Download</p></a>
                             <a onClick={(e) => deleteFolder(e, folder._id)} className="dropdown-item" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} href="#"><i className="las la-trash"></i><p>Delete</p></a>
                             <a onClick={() => setselectedFolder(folder.name)} className="dropdown-item" data-toggle="modal" data-target="#moveFolder" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} href="#"><i className="las la-folder-plus"></i><p>Move to</p></a>
-                            <a onClick={() => setselectedFolder(folder.name)} className="dropdown-item" data-toggle="modal" data-target="#shareFolder" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} href="#"><i className="las la-user-plus"></i><p>Share</p></a>
+                           
                    </div>        
                 </a>
                     </div>
@@ -224,7 +228,7 @@ const Content = () => {
                        </div>
                          { currUser.sharedFolder.map(folder => (                         
                                   
-                            <div className="cards__item">
+                            <div  key={folder._id} className="cards__item">
                                   
                               <div className="card">
                               <div className="card__content">
@@ -256,16 +260,19 @@ const Content = () => {
                         </div>
                     </div>
                     <div className="card__type">
-                        <div className="card__left_type">
-                            <p>Type of File</p>
-                        </div>
-                        <div className="card__right card__img">
-                            <img src="https://www.gstatic.com/images/branding/product/2x/docs_48dp.png" alt="" />
-                            <img src="https://www.gstatic.com/images/branding/product/2x/sheets_48dp.png" alt="" />
-                            <img src="https://www.gstatic.com/images/branding/product/2x/slides_48dp.png" alt="" />
-                        </div>
-    
-                    </div>                
+                    <div className="card__left_type">
+                        <p>Type of File(s)</p>                        
+                    </div>
+                    <div className="card__right card__img">
+                        
+                        {folder.files.map(file =>(
+                            <img src={typeofFile(file.filename)} alt="" />
+
+                        ))}
+                        
+                    </div>
+
+                </div>           
                     </Link>
     
                     <a className="card-icon">
@@ -296,7 +303,7 @@ const Content = () => {
                 
                      { folders.map(folder => (                         
                               
-                        <div className="cards__item">
+                        <div key={folder._id} className="cards__item">
                               
                           <div className="card">
                           <div className="card__content">
@@ -329,26 +336,29 @@ const Content = () => {
                 </div>
                 <div className="card__type">
                     <div className="card__left_type">
-                        <p>Type of File</p>
+                        <p>Type of File(s)</p>                        
                     </div>
                     <div className="card__right card__img">
-                        <img src="https://www.gstatic.com/images/branding/product/2x/docs_48dp.png" alt="" />
-                        <img src="https://www.gstatic.com/images/branding/product/2x/sheets_48dp.png" alt="" />
-                        <img src="https://www.gstatic.com/images/branding/product/2x/slides_48dp.png" alt="" />
+                        
+                        {folder.files.map(file =>(
+                            <img src={typeofFile(file.filename)} alt="" />
+
+                        ))}
+                        
                     </div>
 
-                </div>                
+                </div>              
                 </Link>
 
                 <a className="card-icon">
-                    <a className="">
-                        <i className="las la-user-plus"></i>
-                    </a>                       
+                <a onClick={() => setselectedFolder(folder._id)}  data-toggle="modal" data-target="#shareFolder" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} href="#"><i className="las la-user-plus"></i></a>
+                                  
                     <a href={folder.location} id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i className="las la-ellipsis-v"></i></a>
                             <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <a href={folder.location} className="dropdown-item" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} href="#"><i className="las la-download"></i><p>Download</p></a>
                             <a onClick={(e) => deleteFolder(e, folder._id)} className="dropdown-item" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} href="#"><i className="las la-trash"></i><p>Delete</p></a>
                             <a onClick={() => setselectedFolder(folder.name)} className="dropdown-item" data-toggle="modal" data-target="#moveFolder" style={{display:'flex',padding:'0px', paddingLeft:'5px'}} href="#"><i className="las la-folder-plus"></i><p>Move to</p></a>
+                           
                    </div>        
                 </a>
                     </div>

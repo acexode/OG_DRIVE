@@ -1,8 +1,7 @@
-import React, { useContext,useState,useCallback,useEffect } from 'react'
+import React, { useContext,useState,useEffect } from 'react'
 import {FileContext} from '../FileContext/FileContext'
 import {useDropzone} from 'react-dropzone'
 import {getFile} from './helper'
-import axios from 'axios'
 
 const thumbsContainer = {
     display: 'flex',

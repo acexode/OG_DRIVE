@@ -4,8 +4,7 @@ import { useLocation } from 'react-router-dom'
 const $ = window.$
 const CreateFolder = ({}) => {
      const {createFolder} = useContext(FileContext)
-      let location = useLocation()
-      console.log(location)
+      let location = useLocation()   
      
     const [foldername, setfoldername] = useState('folder name')
     const [isFolder, setisFolder] = useState()
@@ -32,10 +31,8 @@ const CreateFolder = ({}) => {
       setisFolder(location.pathname.includes("folder"))
       
     }, [isFolder])
-    console.log('isFolder', isFolder)
-    console.log('isFolder', location.pathname.slice(location.pathname.lastIndexOf("/") + 1))
-    const handleSelectChange =(event) => {
-        console.log(event.target.value)
+   
+    const handleSelectChange =(event) => {       
         setfoldername(event.target.value)
     }
     const onsubmit= (e) =>{
@@ -52,8 +49,7 @@ const CreateFolder = ({}) => {
             }
             if(isFolder){
               obj.parent = location.pathname.slice(location.pathname.lastIndexOf("/") + 1)
-            }
-            console.log(obj)
+            }            
 
             createFolder(obj).then(data =>{
               if(data.success){

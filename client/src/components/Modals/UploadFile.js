@@ -1,9 +1,9 @@
-import React, { useContext,useState,useCallback,useEffect } from 'react'
+import React, { useContext,useState,useEffect } from 'react'
 import {FileContext} from '../FileContext/FileContext'
 import {useDropzone} from 'react-dropzone'
 import axios from 'axios'
 const $ = window.$
-console.log($)
+
 function getFile(filename, location) {      
     let spl = filename.split('.')
     let img = ['png','jpg', 'jpeg', 'gif', 'bmp']
@@ -51,9 +51,9 @@ const thumbsContainer = {
     height: '100%'
   };
 
-const UploadFile = ({selectedFile}) => {
+const UploadFile = ({selectedFile, id}) => {
      const {uploadFile, uploadFiles} = useContext(FileContext)
-  
+    
     const [errorMsg, setErrorMsg] = useState()
     const [sucessMsg, setsucessMsg] = useState()
     const [isSuccess, setisSuccess] = useState(false)
@@ -77,18 +77,14 @@ const UploadFile = ({selectedFile}) => {
     }
     const {getRootProps, getInputProps} = useDropzone({    
       onDrop: acceptedFiles => {
-          console.log(acceptedFiles)
+        
           if(acceptedFiles.length == 1){
             const formData = new FormData();
             acceptedFiles.forEach(file => {     
-              file.folder = "root"
-              console.log(file)
+              file.folder = "root"             
               formData.append('file',file)           
-            })  
-            // formData.append("folder", "root")   
-            // console.log(formData.getAll())      
-            uploadFile(formData).then(data =>{
-                console.log(data)
+            })                 
+            uploadFile(formData,id).then(data =>{                
                 setisSuccess(true)
                 setsucessMsg(data.msg)
                 removeSuccessAlert()
@@ -104,8 +100,7 @@ const UploadFile = ({selectedFile}) => {
               formData.append('files',file)           
             })
             
-            uploadFiles(formData).then(data =>{
-                console.log(data)
+            uploadFiles(formData, id).then(data =>{              
                 setisSuccess(true)
                 setsucessMsg(data.msg)
                 removeSuccessAlert()
@@ -134,25 +129,18 @@ const UploadFile = ({selectedFile}) => {
       </div>
     ));
     useEffect(() => () => {       
-        files.forEach(file => URL.revokeObjectURL(file.preview));
-        console.log(files)
+        files.forEach(file => URL.revokeObjectURL(file.preview));        
       }, [files]);
     
   
     const handleSelectChange =(event) => {
-        console.log(event.target.files)
-        console.log(event.target.files[0])
-
         setmyFiles(event.target.files[0])
-
     }
     const onsubmit= (e) =>{
         e.preventDefault();
-        const formData = new FormData();
-        console.log(myfiles)
-        formData.append('file',myfiles)
-    console.log(formData.get('file'))
-    let token = localStorage.getItem('token')
+        const formData = new FormData();        
+        formData.append('file',myfiles)  
+      let token = localStorage.getItem('token')
     // uploadFile(formData)
     axios.post('/file',formData, {headers: {'Authorization': `Bearer ${token}`, 'content-type': 'multipart/form-data'}})
     .then(res =>{

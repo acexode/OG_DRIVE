@@ -7,6 +7,7 @@ const dotenv = require('dotenv').config()
 const User = require('../model/user')
 const Files = require('../model/file')
 const Folder = require('../model/folder')
+const Trash = require('../model/trash')
 const AWS = require('aws-sdk');
 const fs = require('fs')
 const helper = require('../helper/helper');
@@ -85,6 +86,27 @@ router.get('/folders',passport.authenticate('jwt', { session: false}), (req, res
       return res.status(403).send({success: false, msg: 'Unauthorized.'});
     }
 })
+/**
+ * 
+ * Get files belonging to  user 
+ * 
+ */
+router.get('/trashes',passport.authenticate('jwt', { session: false}), (req, res) =>{
+    var token = helper.getToken(req.headers)     
+    if (token) {
+       
+            Trash.find({user: req.user._id}, {}, (err, trashes)=>{
+                if(err){
+                    return res.json({success: false, msg: 'no file found'});
+                }else{                   
+                    return res.status(200).send({success: true, msg: `found ${trashes.length} files belonging to user`, trashes});
+                }
+            }) 
+      
+    } else {
+      return res.status(403).send({success: false, msg: 'Unauthorized.'});
+    }
+})
 
 /**
  * 
@@ -137,6 +159,7 @@ router.post('/file/:id', passport.authenticate('jwt', { session: false}),storage
 router.post('/files/:id', passport.authenticate('jwt', { session: false}),storage.array('files'), function(req, res) {
     var token = helper.getToken(req.headers)
     console.log(req.files)
+    let folder = req.params.id 
     if (token) {
         if(req.files){  
             let files = req.files.map(e =>{
@@ -147,11 +170,22 @@ router.post('/files/:id', passport.authenticate('jwt', { session: false}),storag
                 }
                 return obj
             })
-            Files.create(files).then(docs =>{
-                return res.status(200).send({success: true, msg: 'Saved to storage.'});
-            }).catch(err =>{
-                return res.json({success: false, msg: 'unable to save file to db'});
-            })  
+            if(folder == 'root'){
+                Files.create(files).then(files =>{
+                    return res.status(200).send({success: true, msg: 'Saved to storage.', files});
+                }).catch(err =>{
+                    return res.json({success: false, msg: 'unable to save file to db'});
+                })  
+
+            }else{
+                Folder.findByIdAndUpdate({_id: folder }, {$addToSet: {'files': files}}, (err, files) =>{
+                    if(err){
+                        return res.json({success: false, msg: 'unable to save file to folder'});
+                    }else{
+                        return res.status(200).send({success: true, msg: 'Saved to storage.', files});
+                    }
+                })
+            }
             
         }
     } else {
@@ -168,6 +202,19 @@ router.post('/delete-file', passport.authenticate("jwt", { session: false }), fu
     if(token){
       
         Files.findByIdAndDelete({_id: req.body._id},(err, doc)=>{
+            if(doc != null){
+                let newTrash = new Trash({
+                    user: req.user._id,
+                    files: doc
+                })     
+                console.log(doc)       
+                newTrash.save((err, trash) =>{
+                    console.log('from trash')
+                    if(err){
+                        console.log(err)
+                    }
+                })
+            }
             if(err){
                 return res.json({success: false, err, msg: 'unable to delete file'});
             }else{

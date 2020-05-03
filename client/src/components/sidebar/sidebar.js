@@ -1,11 +1,13 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
+import logo from '../../assets/default_images/outsource-logo-square.png';
 
 const Sidebar = () => {
     return (
         <nav id="sidebar">
         <div className="sidebar-header">
-            <a><i className="lab la-google-drive"></i> OG Drive +</a>
+            <a><img style={{width: '80px', marginTop: '-5px'}} src={logo} /> <span className="drive"> Drive+</span> </a>
         </div>
 
         <ul className="list-unstyled components">
@@ -16,34 +18,34 @@ const Sidebar = () => {
             <a data-toggle="modal" data-target="#uploadFile"   className="dropdown-item text-dark padLeft" style={{display:'flex'}} href="#"><i className="las la-file-medical"></i><p className="text-dark">Upload File</p></a>
               
             </div>
-            <a className="first" href="">
+            <Link className="sidebar-link active" to="/">
                 <i className="las la-hdd"></i>
                My Drive
-            </a>
-            <a href="">
+            </Link>
+            {/* <Link className="sidebar-link" to="">
                 <i className="las la-laptop"></i>
                Computers
-            </a>
-            <a href="">
+            </Link> */}
+            <Link to="/shared" className="sidebar-link" >
                 <i className="las la-users"></i>
                Shared with me
-            </a>
-            <a href="">
+            </Link>
+            <Link className="sidebar-link" to="/recent">
                 <i className="las la-clock"></i>
                Recent
-            </a>
-            <a href="">
+            </Link>
+            <Link className="sidebar-link" to="/starred">
                 <i className="lar la-star"></i>
                Starred
-            </a>
-            <a href="">
+            </Link>
+            <Link className="sidebar-link" to="/trash">
                 <i className="las la-trash-alt"></i>
               Trash
-            </a>
-            <a href="">
+            </Link>
+            <Link className="" >
                 <i className="las la-server"></i>
               Backups
-            </a>
+            </Link>
         </ul>
         <ul  className="store-details">
             <a  href="">Store Details</a>
